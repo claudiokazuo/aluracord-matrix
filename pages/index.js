@@ -3,7 +3,7 @@ import { Box, Button, Text, TextField, Image } from "@skynexui/components";
 import React from "react";
 import { useRouter } from "next/router";
 
-function Titulo(props) {
+function Titulo(props) {    
   console.log(props);
   const Tag = props.tag || "h1";
   return (
@@ -59,7 +59,9 @@ export default function PaginaInicial() {
           }}
           onSubmit={function (event) {
             event.preventDefault();
-            roteamento.push("/chat");
+            roteamento.push( {
+                pathname: "/chat", 
+                query: {username :username}});
             console.log("alguem submteu");
           }}
         >
@@ -136,7 +138,7 @@ export default function PaginaInicial() {
               borderRadius: "50%",
               marginBottom: "16px",
             }}
-            src={`https://github.com/${username}.png`}            
+            src={`https://github.com/${username}.png`}
             style={{ display: username.length <= 2 ? "none" : "block" }}
           />
           <Text
