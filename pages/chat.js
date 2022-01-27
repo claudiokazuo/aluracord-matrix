@@ -2,41 +2,71 @@ import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
 import { useRouter } from "next/router";
+import { createClient } from "@supabase/supabase-js";
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
+  const [mensagem, setMensagem] = React.useState("");
+  const [listaMensagem, setListaMensagem] = React.useState([]);
   const router = useRouter();
   const [username, setUsername] = useState("");
-
+  const [hover, setHover] = useState(false);
   useEffect(() => {
     const value = router.query.username;
     setUsername(value);
 
+    supabaseClient
+      .from("mensagens")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        console.log("dados da consulta", data);
+        setListaMensagem(data);
+      });
+
     return () => {};
   }, []);
 
+  const handleHover = (value) => {
+      setHover(value);
+  }
   // Sua lógica vai aqui
-  const [mensagem, setMensagem] = React.useState("");
-  const [listaMensagem, setListaMensagem] = React.useState([]);
 
   const handleExcluiMensagem = (id) => {
-    const novaListaMensagem = listaMensagem.filter((mensagem) => {
-      return mensagem.id !== id;
-    });
-    setListaMensagem(novaListaMensagem);
-
-  }
+    supabaseClient
+      .from("mensagens")
+      .delete()
+      .match({ id: id })
+      .then((response) => {
+        console.log("Excluir", response);
+        const novaListaMensagem = listaMensagem.filter((mensagem) => {
+          return mensagem.id !== id;
+        });
+        setListaMensagem(novaListaMensagem);
+      });
+  };
 
   const handleNovaMensagem = (novaMensagem) => {
+    console.log(username);
     const mensagem = {
-      id: listaMensagem.length + 1,
       de: username,
       texto: novaMensagem,
     };
-    if (novaMensagem !== "") setListaMensagem([mensagem, ...listaMensagem]);
-    setMensagem("");
+
+    if (novaMensagem !== "") {
+      supabaseClient
+        .from("mensagens")
+        .insert(mensagem)
+        .then(({ data }) => {
+          console.log("Criando mensagem", data[0]);
+          setListaMensagem([data[0], ...listaMensagem]);
+          setMensagem("");
+        });
+    }
   };
 
-  // ./Sua lógica vai aqui
   return (
     <>
       <Box
@@ -73,7 +103,12 @@ export default function ChatPage() {
               </li>);
           })} */}
 
-          <MessageList mensagens={listaMensagem} username={username} excluir ={handleExcluiMensagem} />
+          <MessageList
+            mensagens={listaMensagem}
+            username={username}
+            excluir={handleExcluiMensagem}
+            posicionar = {handleHover}
+          />
 
           <Box
             as="form"
@@ -162,6 +197,17 @@ function MessageList(props) {
         marginBottom: "16px",
       }}
     >
+      {props.mensagens.length === 0 && (
+        <Image
+          styleSheet={{
+            width: "300px",
+            height: "300px",
+            borderRadius: "50%",
+            display: "flex",
+          }}
+          src={"https://c.tenor.com/Jw8I___MCdQAAAAC/matrix-dodge.gif"}
+        />
+      )}
       {props.mensagens.map((mensagem) => {
         return (
           <Text
@@ -189,7 +235,13 @@ function MessageList(props) {
                   display: "inline-block",
                   marginRight: "8px",
                 }}
-                src={`https://github.com/${props.username}.png`}
+                src={`https://github.com/${mensagem.de}.png`}
+                onMouseOver={(e) => {
+                    props.posicionar(true);                     
+                }}
+                onMouseOut={(e) => {
+                    props.posicionar(false);
+                }}
               />
               <Text tag="strong">{mensagem.de}</Text>
               <Text
@@ -204,7 +256,7 @@ function MessageList(props) {
               </Text>
               <Button
                 variant="tertiary"
-                colorVariant="primary"
+                colorVariant="light"
                 label="Excluir"
                 onClick={(e) => {
                   e.preventDefault();
