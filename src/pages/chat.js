@@ -4,7 +4,7 @@ import appConfig from "../../config.json";
 import { useRouter } from "next/router";
 import { createClient } from "@supabase/supabase-js";
 import { ButtonSendSticker } from "../components/ButtonSendSticker";
-import { GitHubUserContext } from '../contexts/user';
+import { GitHubUserContext } from "../contexts/user";
 
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -160,6 +160,16 @@ export default function ChatPage() {
               alignItems: "center",
             }}
           >
+            <Image
+              styleSheet={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                display: "inline-block",
+                marginRight: "8px",
+              }}
+              src={`https://github.com/${username}.png`}
+            />
             <TextField
               value={mensagem}
               onChange={(e) => {
@@ -185,9 +195,19 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
-            <Button
-              variant="tertiary"
-              colorVariant="primary"
+            <Image
+              styleSheet={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                display: "inline-block",
+                marginRight: "8px",
+                cursor: "pointer",
+                filter: "invert(100%)",
+              }}
+              src={`https://cdn4.iconfinder.com/data/icons/multimedia-75/512/multimedia-42-512.png`}
+              // variant="tertiary"
+              // colorVariant="primary"
               label="Enviar"
               onClick={(e) => {
                 e.preventDefault();
