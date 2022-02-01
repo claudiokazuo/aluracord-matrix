@@ -1,30 +1,21 @@
-import appConfig from "../config.json";
+import appConfig from "../../config.json";
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
-import React from "react";
-import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
-function Titulo(props) {    
-  console.log(props);
-  const Tag = props.tag || "h1";
-  return (
-    <>
-      <Tag>{props.children}</Tag>
-      <style jsx>
-        {`
-          ${Tag} {
-            color: ${appConfig.theme.colors.neutrals["000"]};
-            font-size: 24px;
-            font-weight: 600;
-          }
-        `}
-      </style>
-    </>
-  );
-}
+export default function Profile() {
+  const url = "https://api.github.com/users/claudiokazuo";
+  const user = {id: null, name: "", bio: "", avatar_url: ""};
+  const [data, setData] = useState(user);
 
-export default function PaginaInicial() {
-  const [username, setUsername] = React.useState("claudiokazuo");
-  const roteamento = useRouter();
+  useEffect(() => {
+    fetch(url)
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        console.log(json);
+      });
+  }, []);
   return (
     <>
       <Box
@@ -59,13 +50,11 @@ export default function PaginaInicial() {
           }}
           onSubmit={function (event) {
             event.preventDefault();
-            roteamento.push( {
-                pathname: "/chat", 
-                query: {username :username}});
+            roteamento.push("/chat");
             console.log("alguem submteu");
           }}
         >
-          <Titulo tag="h2">Welcome back to the real world</Titulo>
+          {/* <Titulo tag="h2">Welcome back to the real world</Titulo> */}
           <Text
             variant="body3"
             styleSheet={{
@@ -96,11 +85,6 @@ export default function PaginaInicial() {
                 mainColorHighlight: appConfig.theme.colors.primary[500],
                 backgroundColor: appConfig.theme.colors.neutrals[800],
               },
-            }}
-            value={username}
-            onChange={function (event) {
-              const value = event.target.value;
-              setUsername(value);
             }}
           />
           <Button
@@ -138,8 +122,6 @@ export default function PaginaInicial() {
               borderRadius: "50%",
               marginBottom: "16px",
             }}
-            src={`https://github.com/${username}.png`}
-            style={{ display: username.length <= 2 ? "none" : "block" }}
           />
           <Text
             variant="body4"
@@ -150,7 +132,7 @@ export default function PaginaInicial() {
               borderRadius: "1000px",
             }}
           >
-            {username}
+            {/* {username} */}
           </Text>
         </Box>
         {/* Photo Area */}

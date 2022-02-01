@@ -1,4 +1,4 @@
-import appConfig from "../config.json";
+import appConfig from "../../config.json";
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
 
 export default function _404() {

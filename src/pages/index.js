@@ -1,21 +1,34 @@
-import appConfig from "../config.json";
+import appConfig from "../../config.json";
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
-import React, { useEffect, useState } from "react";
+import React, { useContext }from "react";
+import { useRouter } from "next/router";
+import { GitHubUserContext} from "../contexts/user"
 
-export default function Profile() {
-  const url = "https://api.github.com/users/claudiokazuo";
-  const user = {id: null, name: "", bio: "", avatar_url: ""};
-  const [data, setData] = useState(user);
 
-  useEffect(() => {
-    fetch(url)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        console.log(json);
-      });
-  }, []);
+function Titulo(props) {    
+  console.log(props);
+  const Tag = props.tag || "h1";
+  return (
+    <>
+      <Tag>{props.children}</Tag>
+      <style jsx>
+        {`
+          ${Tag} {
+            color: ${appConfig.theme.colors.neutrals["000"]};
+            font-size: 24px;
+            font-weight: 600;
+          }
+        `}
+      </style>
+    </>
+  );
+}
+
+export default function PaginaInicial() {  
+  const { setGithubUser } = useContext(GitHubUserContext);
+  const [username, setUsername] = React.useState("claudiokazuo");
+  const roteamento = useRouter();
+  
   return (
     <>
       <Box
@@ -50,11 +63,15 @@ export default function Profile() {
           }}
           onSubmit={function (event) {
             event.preventDefault();
+            setGithubUser(username);
             roteamento.push("/chat");
+            // roteamento.push( {
+            //     pathname: "/chat", 
+            //     query: {username :username}});
             console.log("alguem submteu");
           }}
         >
-          {/* <Titulo tag="h2">Welcome back to the real world</Titulo> */}
+          <Titulo tag="h2">Welcome back to the real world</Titulo>
           <Text
             variant="body3"
             styleSheet={{
@@ -85,6 +102,11 @@ export default function Profile() {
                 mainColorHighlight: appConfig.theme.colors.primary[500],
                 backgroundColor: appConfig.theme.colors.neutrals[800],
               },
+            }}
+            value={username}
+            onChange={function (event) {
+              const value = event.target.value;
+              setUsername(value);
             }}
           />
           <Button
@@ -122,6 +144,8 @@ export default function Profile() {
               borderRadius: "50%",
               marginBottom: "16px",
             }}
+            src={`https://github.com/${username}.png`}
+            style={{ display: username.length <= 2 ? "none" : "block" }}
           />
           <Text
             variant="body4"
@@ -132,7 +156,7 @@ export default function Profile() {
               borderRadius: "1000px",
             }}
           >
-            {/* {username} */}
+            {username}
           </Text>
         </Box>
         {/* Photo Area */}

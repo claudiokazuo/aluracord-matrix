@@ -1,4 +1,5 @@
-import appConfig from "../config.json";
+import appConfig from "../../config.json";
+import GitHubUserProvider from "../contexts/user";
 import { Box } from "@skynexui/components";
 function GlobalStyle() {
   return (
@@ -49,7 +50,9 @@ export default function MyApp({ Component, pageProps }) {
           backgroundBlendMode: "multiply",
         }}
       >
-        <Component {...pageProps} />
+        <GitHubUserProvider>
+          <Component {...pageProps} />
+        </GitHubUserProvider>
       </Box>
     </>
   );

@@ -1,9 +1,10 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
-import React, { useEffect, useState } from "react";
-import appConfig from "../config.json";
+import React, { useEffect, useState, useContext } from "react";
+import appConfig from "../../config.json";
 import { useRouter } from "next/router";
 import { createClient } from "@supabase/supabase-js";
-import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
+import { ButtonSendSticker } from "../components/ButtonSendSticker";
+import { GitHubUserContext } from '../contexts/user';
 
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -26,10 +27,11 @@ function escutaMensagemEmTempoReal(faz) {
 }
 
 export default function ChatPage() {
+  const { githubUser } = useContext(GitHubUserContext);
   const [mensagem, setMensagem] = React.useState("");
   const [listaMensagem, setListaMensagem] = React.useState([]);
   const router = useRouter();
-  const username = router.query.username;
+  const username = githubUser; //router.query.username;
   const [hover, setHover] = useState(false);
 
   const callbackAfterInsert = (novaMensagem) => {
@@ -73,9 +75,8 @@ export default function ChatPage() {
 
   const handleHover = (value) => {
     setHover(value);
+    return <ButtonSendSticker />;
   };
-  // Sua lógica vai aqui
-
   const handleExcluiMensagem = (id) => {
     supabaseClient
       .from("mensagens")
@@ -277,8 +278,8 @@ function MessageList(props) {
             >
               <Image
                 styleSheet={{
-                  width: "20px",
-                  height: "20px",
+                  width: "40px",
+                  height: "40px",
                   borderRadius: "50%",
                   display: "inline-block",
                   marginRight: "8px",
@@ -302,16 +303,32 @@ function MessageList(props) {
               >
                 {new Date().toLocaleDateString()}
               </Text>
-              <Button
+              {/* <Button
                 variant="tertiary"
                 colorVariant="light"
-                label="Excluir"
+                //label="Excluir"
                 onClick={(e) => {
                   e.preventDefault();
                   console.log(props);
                   props.excluir(mensagem.id);
                 }}
-              />
+              >               */}
+              <Image
+                styleSheet={{
+                  width: "20px",
+                  height: "20px",
+                  display: "inline-block",
+                  marginLeft: "10px",
+                  cursor: "pointer",
+                }}
+                src="https://cdn4.iconfinder.com/data/icons/simplicio/128x128/notification_error.png"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log(props);
+                  props.excluir(mensagem.id);
+                }}
+              ></Image>
+              {/* </Button> */}
             </Box>
             {mensagem.texto.startsWith(":sticker:") ? (
               <Image
